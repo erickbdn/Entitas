@@ -22,7 +22,7 @@ export default function Home() {
       </h1>
 
       {/* Left Section (Always Visible) */}
-      <div className="lg:w-1/2 relative p-12 flex flex-col items-center lg:items-start text-center lg:text-left">
+      <div className="lg:w-1/2 relative p-12 flex flex-col items-center lg:items-start text-center lg:text-left mb-0 lg:mb-40">
         <div className="absolute top-1/2 -translate-y-1/2 lg:ml-12 max-w-md mt-40 pb-6 lg:mt-0 lg:pb-0">
           <svg
             width="24"

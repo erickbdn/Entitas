@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomCard } from "../ui/custom-card";
+import { useAppDispatch } from "@/store"; // Import our typed dispatch
 
 export default function SignInForm() {
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,9 +25,9 @@ export default function SignInForm() {
     setError("");
 
     try {
-      await signIn(email, password);
+      await dispatch(signIn(email, password)); // ✅ Fixes TS warning
       console.log("✅ Signed in successfully!");
-      router.push("/dashboard"); // Redirect to dashboard after sign-in
+      router.push("/"); // Redirect to dashboard after sign-in
       // Redirect to dashboard or another page if needed
     } catch (err) {
       console.log(err)

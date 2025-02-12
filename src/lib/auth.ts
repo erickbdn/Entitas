@@ -1,43 +1,33 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
-import { auth } from "./firebase"; // Import Firebase instance
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { AppDispatch } from "@/store";
+import { setUser, logoutUser, setLoading } from "@/store/slices/authSlice";
 
-// Sign In Function
-export const signIn = async (email: string, password: string) => {
+export const signUp = (fullName: string, email: string, password: string) => async (dispatch: AppDispatch) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error(String(error));
-    }
-  }
-};
-
-// Sign Up Function
-export const signUp = async (email: string, password: string) => {
-  try {
+    dispatch(setLoading(true));
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    dispatch(setUser({ fullName, email: userCredential.user.email || "" }));
   } catch (error) {
-    if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error(String(error));
-      }
+    console.error("Signup Error:", error);
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 
-// Sign Out Function
-export const logout = async () => {
+export const signIn = (email: string, password: string) => async (dispatch: AppDispatch) => {
   try {
-    await signOut(auth);
+    dispatch(setLoading(true));
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    dispatch(setUser({ fullName: "User", email: userCredential.user.email || "" }));
   } catch (error) {
-    if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error(String(error));
-      }
+    console.error("Signin Error:", error);
+  } finally {
+    dispatch(setLoading(false));
   }
+};
+
+export const logout = () => async (dispatch: AppDispatch) => {
+  await signOut(auth);
+  dispatch(logoutUser());
 };
