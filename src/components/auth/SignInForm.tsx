@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CustomCard } from "../ui/custom-card";
+import { CustomCard } from "../ui/CustomCard";
 import { useAppDispatch } from "@/store"; // Import our typed dispatch
 
 export default function SignInForm() {
@@ -25,9 +25,8 @@ export default function SignInForm() {
     setError("");
 
     try {
-      await dispatch(signIn(email, password)); // ✅ Fixes TS warning
-      console.log("✅ Signed in successfully!");
-      router.push("/"); // Redirect to dashboard after sign-in
+      await dispatch(signIn(email, password)); // c
+      router.push("/dashboard"); // Redirect to protected ERP route after sign-in
       // Redirect to dashboard or another page if needed
     } catch (err) {
       console.log(err)
@@ -52,6 +51,7 @@ export default function SignInForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
               className="bg-transparent border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
             />
           </div>
@@ -63,6 +63,7 @@ export default function SignInForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
               className="bg-transparent border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
             />
           </div>

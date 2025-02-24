@@ -1,12 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SignInForm from "@/components/auth/SignInForm";
 import SignUpForm from "@/components/auth/SignUpForm";
 import { Button } from "@/components/ui/button";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true); // Prevents flickering
   const [isSignUp, setIsSignUp] = useState(false);
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        router.replace("/dashboard"); // Redirect if already signed in
+      } else {
+        setCheckingAuth(false); // Allow the sign-in page to render
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  if (checkingAuth) return null; // Avoid showing the sign-in form while checking
 
   return (
     <div

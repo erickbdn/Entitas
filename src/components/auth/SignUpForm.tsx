@@ -3,35 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/index";
+import { signUp } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CustomCard } from "../ui/custom-card";
-import { signUp } from "@/lib/auth"; // Import auth function
+import { CustomCard } from "../ui/CustomCard";
 
 export default function SignUpForm() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
-    try {
-      await signUp(email, password);
-      router.push("/dashboard"); // Redirect to dashboard after sign-up
-    } catch (err) {
-      console.log(err)
-      setError("Failed to sign up. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    console.log("Submitting sign-up with:", { email, password });
+    e.preventDefault();
+    await dispatch(signUp(email, password));
+
+    router.push("/dashboard"); // Redirect after sign-up
   };
 
   return (
@@ -43,20 +38,6 @@ export default function SignUpForm() {
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="full-name" className="text-secondary-light">
-              Full Name
-            </Label>
-            <Input
-              id="full-name"
-              placeholder="Enter your full name"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              className="bg-transparent border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
-            />
-          </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-secondary-light">
               Email
@@ -81,6 +62,7 @@ export default function SignUpForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
               required
               className="bg-transparent border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30"
             />

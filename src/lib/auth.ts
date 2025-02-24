@@ -3,11 +3,11 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { AppDispatch } from "@/store";
 import { setUser, logoutUser, setLoading } from "@/store/slices/authSlice";
 
-export const signUp = (fullName: string, email: string, password: string) => async (dispatch: AppDispatch) => {
+export const signUp = (email: string, password: string) => async (dispatch: AppDispatch) => {
   try {
     dispatch(setLoading(true));
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    dispatch(setUser({ fullName, email: userCredential.user.email || "" }));
+    dispatch(setUser({ email: userCredential.user.email || "" }));
   } catch (error) {
     console.error("Signup Error:", error);
   } finally {
@@ -19,7 +19,7 @@ export const signIn = (email: string, password: string) => async (dispatch: AppD
   try {
     dispatch(setLoading(true));
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    dispatch(setUser({ fullName: "User", email: userCredential.user.email || "" }));
+    dispatch(setUser({ email: userCredential.user.email || "" }));
   } catch (error) {
     console.error("Signin Error:", error);
   } finally {
