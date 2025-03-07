@@ -7,7 +7,7 @@ export const signUp = (email: string, password: string) => async (dispatch: AppD
   try {
     dispatch(setLoading(true));
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    dispatch(setUser({ email: userCredential.user.email || "" }));
+    dispatch(setUser({ uid: userCredential.user.uid, email: userCredential.user.email || "" }));
   } catch (error) {
     console.error("Signup Error:", error);
   } finally {
@@ -19,7 +19,7 @@ export const signIn = (email: string, password: string) => async (dispatch: AppD
   try {
     dispatch(setLoading(true));
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    dispatch(setUser({ email: userCredential.user.email || "" }));
+    dispatch(setUser({ uid: userCredential.user.uid, email: userCredential.user.email || "" }));
   } catch (error) {
     console.error("Signin Error:", error);
   } finally {

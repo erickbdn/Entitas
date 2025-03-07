@@ -12,6 +12,7 @@ import { NavigationProvider } from "./context/NavigationContext";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Background from "./components/Background";
+// import TestFirestore from "./components/TestFirestore";
 
 interface ProtectedERPLayoutProps {
   children: React.ReactNode;
@@ -51,7 +52,8 @@ export default function ProtectedERPLayout({ children }: ProtectedERPLayoutProps
         {/* Sidebar & Content Wrapper with 24px gutter */}
         <div className="flex flex-1 gap-6">  
           <Sidebar />
-          <main className="flex-1 pt-4">{children}</main>
+          {/* <TestFirestore /> */} {/* Uncomment this line to test Firestore */} 
+          <main className="flex-1 overflow-auto h-[calc(100vh-80px)] pt-4 pb-4 pr-4">{children}</main>
         </div>
       </div>
     </NavigationProvider>

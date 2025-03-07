@@ -403,7 +403,7 @@ function normalizeColor(hexCode) {
                         value: this.amp
                     }),
                     noiseSpeed: new this.minigl.Uniform({
-                        value: 5
+                        value: 1
                     }),
                     noiseFlow: new this.minigl.Uniform({
                         value: 3
@@ -437,7 +437,7 @@ function normalizeColor(hexCode) {
                     type: "vec2"
                 }),
                 noiseSpeed: new this.minigl.Uniform({
-                    value: 4 + .3 * e
+                    value: 1 + .3 * e
                 }),
                 noiseFlow: new this.minigl.Uniform({
                     value: 6.5 + .3 * e

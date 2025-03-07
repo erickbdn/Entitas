@@ -7,8 +7,29 @@ body {
 }
 
 html, body {
-  overflow-x: hidden;
-  width: 100%;
+  overflow-y: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Track color */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-light-05); /* Scrollbar handle color */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-lighter); /* Scrollbar handle color on hover */
+  cursor: pointer;
 }
 
 @layer base {
@@ -53,6 +74,8 @@ html, body {
   /* Secondary Palette */
   --secondary: #dacdbe;
   --secondary-light: #e9e1d8;
+  --secondary-light-01: rgba(233, 225, 216, 0.1);
+  --secondary-light-05: rgba(233, 225, 216, 0.5);
   --secondary-lighter: #f3ebe2;
 
   /* Status Colors */
@@ -131,6 +154,9 @@ html, body {
 .bg-success { background-color: var(--success); }
 .border-success { border-color: var(--success); }
 
+#root, #__next { /* Ensure Next.js root containers fill the viewport */
+  height: 100%;
+}
 
 @layer base {
   * {
@@ -144,5 +170,16 @@ html, body {
 @layer utilities {
   .bg-desktop {
     background-size: 200% !important;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

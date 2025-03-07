@@ -10,7 +10,7 @@ export default function UserActions() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="flex items-center space-x-10">
+    <div className="flex items-center sm:space-x-10">
       {/* User Email (Only visible on lg screens) */}
       <div className="hidden lg:flex text-secondary-lighter text-sm truncate">
         {userEmail || "Loading..."}
