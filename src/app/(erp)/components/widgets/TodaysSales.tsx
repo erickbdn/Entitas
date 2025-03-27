@@ -15,9 +15,15 @@ export function TodaysSales() {
       className="col-span-3 text-accent text-xl bg-[#E9E1D8]/75 relative min-h-40"
       titleClassName="absolute top-4 left-4"
     >
-      <p className="text-5xl font-bold absolute bottom-2 right-4">
-        ${salesData?.todaySales.toLocaleString() || "0"}
-      </p>
+      {salesData ? (
+        <p className="text-5xl font-bold absolute bottom-2 right-4">
+          ${salesData?.todaySales ? salesData.todaySales.toLocaleString() : "0"}
+        </p>
+      ) : (
+        <p className="text-lg absolute bottom-2 right-4 text-gray-500">
+          No data
+        </p>
+      )}
     </DashboardWidget>
   );
 }

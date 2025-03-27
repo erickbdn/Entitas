@@ -1,11 +1,9 @@
 "use client";
 
+import { getAuth } from "firebase/auth";
 import { createContext, useContext, ReactNode } from "react";
 import axios from "axios";
-import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Query Client (single instance)
-const queryClient = new QueryClient();
+import { useQuery } from "@tanstack/react-query";
 
 // Define sales data structure
 interface SalesData {
@@ -32,44 +30,46 @@ interface SalesDataContextType {
 }
 
 // Create context
-const SalesDataContext = createContext<SalesDataContextType | undefined>(undefined);
+const SalesDataContext = createContext<SalesDataContextType | undefined>(
+  undefined
+);
 
-// Fetch Sales Data (with caching)
+// Fetch Sales Data
 async function fetchSalesData() {
-  const response = await axios.get("/api/sales");
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) throw new Error("User not authenticated");
+
+  // 🔹 Get Firebase Token
+  const token = await user.getIdToken();
+  const apiUrl = "http://localhost:3001/api/sales";
+
+  const response = await axios.get(apiUrl, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = response.data;
+  console.log(data)
+
   if (data.error) throw new Error(data.error);
 
   const { monthlySales, previousMonthSales } = data;
   const growth =
-    previousMonthSales > 0 ? ((monthlySales - previousMonthSales) / previousMonthSales) * 100 : null;
+    previousMonthSales > 0
+      ? ((monthlySales - previousMonthSales) / previousMonthSales) * 100
+      : null;
 
   return { salesData: { ...data, growth } };
 }
 
 // Provider component
 export function SalesDataProvider({ children }: { children: ReactNode }) {
-  const { data, error, isLoading } = useQuery({
+  const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["salesData"],
     queryFn: fetchSalesData,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false, // No auto-refetch when switching tabs
   });
-
-  // Optimized refetch function
-  const refetch = async () => {
-    try {
-      const newData = await fetchSalesData();
-      const cachedData = queryClient.getQueryData<{ salesData: SalesData }>(["salesData"]);
-
-      if (JSON.stringify(newData.salesData) !== JSON.stringify(cachedData?.salesData)) {
-        // Update cache only if data is different
-        queryClient.setQueryData(["salesData"], newData);
-      }
-    } catch (error) {
-      console.error("Error fetching sales data:", error);
-    }
-  };
 
   return (
     <SalesDataContext.Provider
@@ -77,7 +77,7 @@ export function SalesDataProvider({ children }: { children: ReactNode }) {
         salesData: data?.salesData || null,
         loading: isLoading,
         error: error ? error.message : null,
-        refetch, // Provide optimized refetch function
+        refetch,
       }}
     >
       {children}
@@ -89,12 +89,9 @@ export function SalesDataProvider({ children }: { children: ReactNode }) {
 export function useSalesDataContext() {
   const context = useContext(SalesDataContext);
   if (!context) {
-    throw new Error("useSalesDataContext must be used within a SalesDataProvider");
+    throw new Error(
+      "useSalesDataContext must be used within a SalesDataProvider"
+    );
   }
   return context;
-}
-
-// Wrap app with QueryClientProvider
-export function SalesDataWrapper({ children }: { children: ReactNode }) {
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

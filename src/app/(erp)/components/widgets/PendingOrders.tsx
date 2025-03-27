@@ -1,26 +1,17 @@
 import { DashboardWidget } from "../subcomponents/DashboardWidget";
-
-const transactions = [
-  { id: "#83713", date: "11/01/2025", amount: "$89.00", status: "Completed" },
-  { id: "#83712", date: "10/01/2025", amount: "$75.00", status: "Cancelled" },
-  { id: "#83711", date: "10/01/2025", amount: "$79.00", status: "Completed" },
-  { id: "#83710", date: "09/01/2025", amount: "$69.00", status: "Pending" },
-  { id: "#83709", date: "08/01/2025", amount: "$89.00", status: "Completed" },
-  { id: "#83708", date: "07/01/2025", amount: "$115.00", status: "Completed" },
-  { id: "#83707", date: "07/01/2025", amount: "$115.00", status: "Completed" },
-  { id: "#83706", date: "07/01/2025", amount: "$115.00", status: "Completed" },
-  { id: "#83705", date: "07/01/2025", amount: "$115.00", status: "Completed" },
-  { id: "#83704", date: "07/01/2025", amount: "$115.00", status: "Completed" },
-];
+import { useRecentTransactionsContext } from "../../context/RecentTransactionsContext";
 
 const statusColors: Record<string, string> = {
-  Completed: "text-green-500 bg-green-100",
+  Shipped: "text-green-500 bg-green-100",
   Pending: "text-yellow-500 bg-yellow-100",
   Cancelled: "text-red-500 bg-red-100",
 };
 
 export function PendingOrders() {
-  const pendingOrders = transactions.filter((tx) => tx.status === "Pending");
+  const { transactions, loading, error } = useRecentTransactionsContext();
+  
+  // Filter only Pending orders
+  const pendingOrders = transactions ? transactions.filter((tx) => tx.status === "Pending") : [];
 
   return (
     <DashboardWidget
@@ -31,7 +22,7 @@ export function PendingOrders() {
     >
       {/* Total Pending Orders Count */}
       <div className="absolute top-4 right-4 text-sm text-secondary-lighter">
-        Total Pending Orders: {pendingOrders.length}
+        Total Pending Orders: {loading ? "..." : pendingOrders.length}
       </div>
 
       {/* Scrollable Container */}
@@ -47,32 +38,51 @@ export function PendingOrders() {
           </thead>
           {/* Scrollable Rows */}
           <tbody>
-            {pendingOrders.map((tx) => (
-              <tr key={tx.id} className="text-sm border-b border-gray-200">
-                <td className="p-2 flex items-center gap-2">
-                  <span
-                    className={`w-1 h-4 rounded-full ${
-                      statusColors[tx.status]
-                    }`}
-                  />
-                  {tx.id}
-                </td>
-                <td className="p-2">{tx.date}</td>
-                <td className="p-2">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-lg ${
-                      statusColors[tx.status]
-                    }`}
-                  >
-                    {tx.status}
-                  </span>
+            {loading ? (
+              <tr>
+                <td colSpan={3} className="text-center p-4">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : error ? (
+              <tr>
+                <td colSpan={3} className="text-center p-4 text-red-500">
+                  {error}
+                </td>
+              </tr>
+            ) : pendingOrders.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-center p-4">
+                  No pending orders
+                </td>
+              </tr>
+            ) : (
+              pendingOrders.map((tx) => (
+                <tr key={tx.id} className="relative text-sm border-b border-gray-200">
+                  <td className="p-2 flex items-center gap-2">
+                    <span
+                      className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-full ${
+                        statusColors[tx.status]
+                      }`}
+                    />
+                    {tx.id}
+                  </td>
+                  <td className="p-2">{tx.date}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-lg ${
+                        statusColors[tx.status]
+                      }`}
+                    >
+                      {tx.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
     </DashboardWidget>
   );
 }
-

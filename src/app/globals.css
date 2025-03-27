@@ -63,6 +63,7 @@ html, body {
     /* Custom */
      /* === Brand Colors === */
   --highlight: #2e4052;
+  --highlight-50: rgba(46, 64, 82, 0.5);
 
   /* Primary Palette */
   --primary: #bca58a;
@@ -80,6 +81,7 @@ html, body {
 
   /* Status Colors */
   --error: #cb4547;  /* Red Alert */
+  --error-15: rgba(203, 69, 71, 0.15);
   --warning: #cbc045; /* Yellow Warning */
   --success: #45cb85; /* Green Success */
   }
@@ -116,6 +118,7 @@ html, body {
 /* === Brand Colors === */
 .text-accent { color: var(--highlight); }
 .bg-accent { background-color: var(--highlight); }
+.bg-accent-50 { background-color: var(--highlight-50); }
 .border-accent { border-color: var(--highlight); }
 
 /* === Primary Palette === */
