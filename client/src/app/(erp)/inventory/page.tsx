@@ -11,11 +11,11 @@ const queryClient = new QueryClient();
 export default function Inventory() {
   return (
     <QueryClientProvider client={queryClient}>
-      <InventoryDataProvider>
+      
         <InventoryProductsProvider>
           <InventoryContent />
         </InventoryProductsProvider>
-      </InventoryDataProvider>
+      
     </QueryClientProvider>
   );
 }

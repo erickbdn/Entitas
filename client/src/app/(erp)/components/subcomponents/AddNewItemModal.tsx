@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react"; // Optional: Use an icon library
 import { useInventoryProductsContext } from "../../context/InventoryProductsContext";
-import axios from "axios";
-import { getAuth } from "firebase/auth";
 
 export function AddNewItemModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { refetch } = useInventoryProductsContext(); // ✅ Refresh after adding item
+  const { refetch, addProduct } = useInventoryProductsContext();
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -27,28 +26,17 @@ export function AddNewItemModal({ isOpen, onClose }: { isOpen: boolean; onClose:
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
-
-      const token = await user.getIdToken();
-
-      await axios.post(
-        "http://localhost:3001/api/inventory-products",
-        {
-          name: formData.name,
-          price: parseFloat(formData.price),
-          stock: parseInt(formData.stock),
-          sku: formData.sku,
-          status: formData.status,
-          imageUrl: formData.imageUrl,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      refetch(); // ✅ Refresh inventory list
+  
+      await addProduct({
+        name: formData.name,
+        price: parseFloat(formData.price),
+        stock: parseInt(formData.stock),
+        sku: formData.sku,
+        status: formData.status,
+        imageUrl: formData.imageUrl,
+      });
+  
+      refetch(); // ✅ Refresh list
       onClose(); // ✅ Close modal
     } catch (error) {
       console.error("Error adding product:", error);
@@ -56,21 +44,54 @@ export function AddNewItemModal({ isOpen, onClose }: { isOpen: boolean; onClose:
       setLoading(false);
     }
   };
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-6 bg-white shadow-lg rounded-lg backdrop-blur-md">
+      <DialogContent className="p-6 bg-[--secondary-light-01] shadow-lg rounded-lg backdrop-blur-3xl border-0">
         <DialogHeader>
-          <DialogTitle>Add New Item</DialogTitle>
+          <DialogTitle className="text-secondary-lighter">Add New Item</DialogTitle>
         </DialogHeader>
 
         {/* 🔹 Input Fields */}
         <div className="space-y-4">
-          <Input name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} />
-          <Input name="price" type="number" placeholder="Price" value={formData.price} onChange={handleChange} />
-          <Input name="stock" type="number" placeholder="Stock" value={formData.stock} onChange={handleChange} />
-          <Input name="sku" placeholder="SKU" value={formData.sku} onChange={handleChange} />
-          <Input name="imageUrl" placeholder="Image URL" value={formData.imageUrl} onChange={handleChange} />
+          <Input
+            name="name"
+            placeholder="Product Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="border-0 border-b border-[--secondary-light-05] text-secondary-lighter rounded-none placeholder:text-[--secondary-light-05]"
+          />
+          <Input
+            name="price"
+            type="number"
+            placeholder="Price"
+            value={formData.price}
+            onChange={handleChange}
+            className="border-0 border-b border-[--secondary-light-05] text-secondary-lighter rounded-none placeholder:text-[--secondary-light-05]"
+          />
+          <Input
+            name="stock"
+            type="number"
+            placeholder="Stock"
+            value={formData.stock}
+            onChange={handleChange}
+            className="border-0 border-b border-[--secondary-light-05] text-secondary-lighter rounded-none placeholder:text-[--secondary-light-05]"
+          />
+          <Input
+            name="sku"
+            placeholder="SKU"
+            value={formData.sku}
+            onChange={handleChange}
+            className="border-0 border-b border-[--secondary-light-05] text-secondary-lighter rounded-none placeholder:text-[--secondary-light-05]"
+          />
+          <Input
+            name="imageUrl"
+            placeholder="Image URL"
+            value={formData.imageUrl}
+            onChange={handleChange}
+            className="border-0 border-b border-[--secondary-light-05] text-secondary-lighter rounded-none placeholder:text-[--secondary-light-05]"
+          />
         </div>
 
         {/* 🔹 Footer Buttons */}
@@ -82,6 +103,14 @@ export function AddNewItemModal({ isOpen, onClose }: { isOpen: boolean; onClose:
             {loading ? "Adding..." : "Add Item"}
           </Button>
         </DialogFooter>
+        <DialogClose asChild>
+      <button
+        className="absolute right-4 top-4 opacity-100 text-secondary-lighter hover:text-[--secondary-lighter] hover:opacity-100 transition-opacity"
+        aria-label="Close"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </DialogClose>
       </DialogContent>
     </Dialog>
   );

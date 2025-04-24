@@ -34,6 +34,17 @@ interface InventoryProductsContextType {
   setSearchTerm: (term: string) => void;
   sort: SortType;
   setSort: (sort: SortType) => void;
+  addProduct: (product: {
+    name: string;
+    price: number;
+    stock: number;
+    sku: string;
+    status: string;
+    imageUrl: string;
+  }) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+
 }
 
 // Context
@@ -58,9 +69,56 @@ async function fetchProducts(page: number, filter: FilterType, search: string, s
   const response = await axios.get(`http://localhost:3001/api/inventory-products?${params.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
+  console.log('im fetching')
   if (response.data.error) throw new Error(response.data.error);
   return response.data;
+}
+
+async function addProduct(product: {
+  name: string;
+  price: number;
+  stock: number;
+  sku: string;
+  status: string;
+  imageUrl: string;
+}) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+
+  const token = await user.getIdToken();
+
+  await axios.post("http://localhost:3001/api/inventory-products", product, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  console.log('im adding')
+}
+
+async function updateProduct(id: string, updates: Partial<Product>) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+
+  const token = await user.getIdToken();
+
+  await axios.patch(`http://localhost:3001/api/inventory-products/${id}`, updates, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log('im updating')
+}
+
+async function deleteProduct(id: string) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
+
+  const token = await user.getIdToken();
+
+  await axios.delete(`http://localhost:3001/api/inventory-products/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log('im deleting')
 }
 
 // Provider Component
@@ -73,7 +131,8 @@ export function InventoryProductsProvider({ children }: React.PropsWithChildren<
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["inventoryProducts", currentPage, filter, searchTerm, sort],
     queryFn: () => fetchProducts(currentPage, filter, searchTerm, sort),
-    staleTime: 5000, 
+    staleTime: 1000 * 60 * 10,          // 5 minutes (or longer if you want)
+    refetchOnWindowFocus: false,      // 🔥 prevents re-fetch on tab switch / alt-tab
   });
 
   return (
@@ -92,6 +151,9 @@ export function InventoryProductsProvider({ children }: React.PropsWithChildren<
         setSearchTerm,
         sort,
         setSort,
+        addProduct,
+        updateProduct, // ✅
+        deleteProduct, // ✅
       }}
     >
       {children}
